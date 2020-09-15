@@ -1,0 +1,27 @@
+{
+  "name": "dotboll",
+  "version": "1.0.0",
+  "description": "Um jogo de futebol",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UltraGabriel77/dotboll.git"
+  },
+  "keywords": [
+    "node",
+    "javascript",
+    "futebol"
+  ],
+  "author": "Gabriel Henrique Silva",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/UltraGabriel77/dotboll/issues"
+  },
+  "homepage": "https://github.com/UltraGabriel77/dotboll#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}

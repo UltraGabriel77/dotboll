@@ -1,1 +1,65 @@
 <!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body {
+                margin: 40px 0 0 0;
+                padding: 0;
+                background-color: #EEE;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <h1> Dotboll </h1>
+        <div id="nome">
+            <form id="name-get">
+                <input type="text" name="name" id="name-getter">
+                <button type="submit">Alterar nome</button>
+            </form>
+        </div>
+        <div id="lista-de-times">
+            <h4>Time 1: </h4>
+            <ul id="timelist1"></ul>
+            <button id="time1">Entrar</button>
+            <h4>Time 2: </h4>
+            <ul id="timelist2"></ul>
+            <button id="time2">Entrar</button>
+        </div>
+        
+
+        
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        <script>
+        $(function(){
+            var socket = io();
+            $('#time1').click(function (e) { 
+                e.preventDefault();
+                socket.emit('time', ["1",socket.id])
+                return false;
+            });
+            $('#time2').click(function (e) { 
+                e.preventDefault();
+                socket.emit('time', ["2",socket.id])
+                return false;
+            });
+            $('#name-get').submit(function (e) {
+                e.preventDefault();
+                socket.emit('name', [socket.id, $('#name-getter').val()])
+            })
+            socket.on('time',function (jogador){
+                $("#timelist"+jogador.time).append($(('<li id="'+jogador.id+'">')).text(jogador.name));
+            });
+            socket.on('reload',function (jogador) {  
+                $("#"+jogador.id).remove();
+                $("#timelist"+jogador.time).append($(('<li id="'+jogador.id+'">')).text(jogador.name));
+            })
+            socket.on('disconnect',(jogador)=>{
+                $("#"+jogador.id).remove();
+            })
+        });
+        
+        </script>
+    </body>
+</html>

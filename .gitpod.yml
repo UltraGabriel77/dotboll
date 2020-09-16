@@ -2,9 +2,12 @@ image: gitpod/workspace-full
 
 tasks:
   - init: npm install && npm run build && npm install -g eslint
-    command: npm run dev
+    command: npm run
 
 vscode:
   extensions:
     - dbaeumer.vscode-eslint@2.1.8:02aHhbJ0Q4aGdjHXlTdVKg==
     - abusaidm.html-snippets@0.2.1:HrYIjYqOIABbxFB9g9kqXQ==
+    - vscode.html-language-features@1.49.0:sh2n4VXKTy7o/m51PxYqzA==
+    - donjayamanne.jquerysnippets@0.0.1:pNN1VghNHf7SDaMeftc/PQ==
+    - ecmel.vscode-html-css@0.2.3:hh8R73s3n0g/eQ8EL9PatQ==

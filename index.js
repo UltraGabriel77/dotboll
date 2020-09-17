@@ -1,57 +1,108 @@
-const {Player} = require('./public/Player');
 const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
-const jogadores = {};
+// eslint-disable-next-line no-unused-vars
+const game = createGame();
 
-app.get('/', (req, res)=>{
+app.get('/', (_req, res)=>{
   res.sendFile(__dirname + '/index.html');
 });
-app.get('/Player.js', (req, res)=>{
-  res.sendFile(__dirname + '/public/Player.js');
+app.get('/game.js', (_req, res)=>{
+  res.sendFile(__dirname + '/game.js');
 });
 
 io.on('connection', (socket)=>{
-  const player = newPlayer(100, 100, socket.id); // Cria um novo jogador
-  Object.values(jogadores).forEach((e) => {
-    // Coloca os outros jogadoresna lista de times
-    if (e.time!=0) {
-      socket.emit('time', e);
-    }
-  });
-  console.log('User conected: ' + player.id);
+  console.log('User conected: ' + socket.id);
+  socket.emit('boostrap', game);
   socket.on('disconnect', () => {
     console.log('user disconnected: '+ socket.id);
-    io.emit('disconnect', jogadores[socket.id]);
+    game.removePlayer(socket.id);
+    io.emit('disconnect', game.players[socket.id]);
   });
-  socket.on('time', (e)=>{
-    console.log(e);
-    jogadores[e[1]].time = e[0];
-    io.emit('reload', jogadores[e[1]]);
+  socket.on('set-team', (socketId, team, name)=>{
+    const player = game.addPlayer(socketId, team, name);
+    console.log(player.name + ' entrou para o time ' + team);
+    player.team = team;
+    io.emit('new-player', {
+      socketId: socketId,
+      novoState: player,
+    });
   });
-  socket.on('name', (e)=>{
-    console.log(e);
-    jogadores[e[0]].name = e[1];
-    io.emit('reload', jogadores[e[1]]);
+  socket.on('move-player', (socketId, direction)=>{
+    game.players[socketId] = game.movePlayer(socketId, direction);
+    socket.broadcast.emit('player-update', {
+      socketId: socketId,
+      novoState: game.players[socketId],
+    });
   });
 });
 
-http.listen(3001, ()=>{
-  console.log('hosting on *:3001');
+http.listen(3000, ()=>{
+  console.log('hosting on *:3000');
 });
 
 /**
- * Cria um novo jogador
- * @param {number} x posição x
- * @param {number} y posição y
- * @param {String} id id do jogador
- * @return {Player} Retorna o novo Player
+ * Cria o jogo
+ * @return {game} retorna o jogo
  */
-function newPlayer(x, y, id) {
-  const player = new Player(x, y, id);
-  jogadores[id] = player;
-  return player;
-}
+function createGame() {
+  const game = {
+    canvasWidth: 200,
+    canvasHeight: 200,
+    players: {},
+    balls: {},
+    gol: {},
+    addPlayer,
+    movePlayer,
+    removePlayer,
+  };
 
+  /**
+   * @param {String} socketId id do jogador
+   * @param {String} team time do jogador
+   * @param {String} name nome escolhido pelo jogador
+   * @return {player} Retorna o objeto player
+   */
+  function addPlayer(socketId, team, name) {
+    return game.players[socketId] = {
+      name: name,
+      x: 100,
+      y: 100,
+      team: team,
+    };
+  }
+
+  /**
+   * Move o jogador
+   * @param {String} socketId
+   * @param {String} direction
+   * @return {jogador} Retorna o jogador movido
+   */
+  function movePlayer(socketId, direction) {
+    player = game.players[socketId];
+    if (direction == 'up' && player.y - 1 >= 0 ) {
+      player.y = player.y - 1;
+    }
+    if (direction == 'left' && player.x - 1 >= 0 ) {
+      player.x = player.x - 1;
+    }
+    if (direction == 'down' && player.y + 1 <= game.canvasHeight ) {
+      player.y = player.y + 1;
+    }
+    if (direction == 'right' && player.x + 1 <= game.canvasWidth ) {
+      player.x = player.x + 1;
+    }
+    return player;
+  }
+
+  /**
+   * @param {String} socketId
+   */
+  function removePlayer(socketId) {
+    delete game.players[socketId];
+  }
+
+  return game;
+}

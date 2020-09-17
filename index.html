@@ -27,66 +27,16 @@
             <button id="time2">Entrar</button>
         </div>
 
-        <canvas id="game" width="200" height="200"></canvas>
+        <canvas id="game" width="200" height="200" style="border:1px solid #000000;"></canvas>
         
 
         
         <script src="/socket.io/socket.io.js"></script>
         <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
         <script>
-            const jogadores = {};
-            $(function() {
-              const socket = io();
-            
-
-              // Alterar o nome e o time
-              $('#time1').click(function(e) {
-                e.preventDefault();
-                socket.emit('time', ['1', socket.id]);
-                return false;
-              });
-              $('#time2').click(function(e) {
-                e.preventDefault();
-                socket.emit('time', ['2', socket.id]);
-                return false;
-              });
-              $('#name-get').submit(function(e) {
-                e.preventDefault();
-                socket.emit('name', [socket.id, $('#name-getter').val()]);
-              });
-            
-              // Atualizar jogadores:
-              socket.on('time', function(jogador) {
-                jogadores[jogador.id] = jogador;
-                $('#timelist'+jogador.time)
-                    .append($(('<li id="'+jogador.id+'">'))
-                        .text(jogador.name));
-              });
-              socket.on('reload', function(jogador) {
-                jogadores[jogador.id] = jogador;
-                $('#'+jogador.id).remove();
-                $('#timelist'+jogador.time)
-                    .append($(('<li id="'+jogador.id+'">'))
-                        .text(jogador.name));
-              });
-              socket.on('disconnect', (jogador)=>{
-                jogadores[jogador.id] = null;
-                $('#'+jogador.id).remove();
-              });
-            });
-
-            const canvas = document.getElementById('game');
-            const contexto = canvas.getContext('2d');
-
-            for (const jogador in jogadores) {
-              if (jogador.getType()==Player) {
-                contexto.moveTo(jogador.x, jogador.y);
-                contexto.arc(95, 50, 40, 0, 2 * Math.PI);
-                contexto.stroke();
-              }
-            }
-            
-
+            // eslint-disable-next-line no-unused-vars
+            const exports = {'__esModule': true};
         </script>
+        <script src="/game.js"></script>
     </body>
 </html>

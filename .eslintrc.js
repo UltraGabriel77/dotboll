@@ -8,9 +8,6 @@ module.exports = {
   'plugins': [
     'html',
   ],
-  'settings': {
-    'html/html-extensions': ['.html', '.vue', '.php', '.twig'],
-  },
   'extends': [
     'google',
   ],

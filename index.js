@@ -5,7 +5,7 @@ const io = require('socket.io')(http);
 
 // eslint-disable-next-line no-unused-vars
 const game = createGame();
-
+game.addBall(200, 200);
 app.get('/', (_req, res)=>{
   res.sendFile(__dirname + '/index.html');
 });
@@ -18,8 +18,8 @@ io.on('connection', (socket)=>{
   socket.emit('boostrap', game);
   socket.on('disconnect', () => {
     console.log('user disconnected: '+ socket.id);
-    game.removePlayer(socket.id);
     io.emit('disconnect', game.players[socket.id]);
+    game.removePlayer(socket.id);
   });
   socket.on('set-team', (socketId, team, name)=>{
     const player = game.addPlayer(socketId, team, name);
@@ -37,6 +37,10 @@ io.on('connection', (socket)=>{
       novoState: game.players[socketId],
     });
   });
+  socket.on('chute', (vectorX, vectorY)=>{
+    game.balls['ball'] = game.chute(vectorX, vectorY);
+  });
+  setInterval(game.movingBall, 100);
 });
 
 http.listen(3000, ()=>{
@@ -49,21 +53,23 @@ http.listen(3000, ()=>{
  */
 function createGame() {
   const game = {
-    canvasWidth: 200,
-    canvasHeight: 200,
+    canvasWidth: 400,
+    canvasHeight: 400,
     players: {},
     balls: {},
     gol: {},
     addPlayer,
     movePlayer,
     removePlayer,
+    addBall,
+    chute,
+    movingBall,
   };
-
   /**
    * @param {String} socketId id do jogador
    * @param {String} team time do jogador
    * @param {String} name nome escolhido pelo jogador
-   * @return {player} Retorna o objeto player
+   * @return {any} Retorna o objeto player
    */
   function addPlayer(socketId, team, name) {
     return game.players[socketId] = {
@@ -73,30 +79,28 @@ function createGame() {
       team: team,
     };
   }
-
   /**
    * Move o jogador
    * @param {String} socketId
    * @param {String} direction
-   * @return {jogador} Retorna o jogador movido
+   * @return {any} Retorna o jogador movido
    */
   function movePlayer(socketId, direction) {
     player = game.players[socketId];
-    if (direction == 'up' && player.y - 1 >= 0 ) {
-      player.y = player.y - 1;
+    if (direction == 'up' && player.y - 4 >= 0) {
+      player.y = player.y - 4;
     }
-    if (direction == 'left' && player.x - 1 >= 0 ) {
-      player.x = player.x - 1;
+    if (direction == 'left' && player.x - 4 >= 0) {
+      player.x = player.x - 4;
     }
-    if (direction == 'down' && player.y + 1 <= game.canvasHeight ) {
-      player.y = player.y + 1;
+    if (direction == 'down' && player.y + 4 <= game.canvasHeight) {
+      player.y = player.y + 4;
     }
-    if (direction == 'right' && player.x + 1 <= game.canvasWidth ) {
-      player.x = player.x + 1;
+    if (direction == 'right' && player.x + 4 <= game.canvasWidth) {
+      player.x = player.x + 4;
     }
     return player;
   }
-
   /**
    * @param {String} socketId
    */
@@ -104,5 +108,50 @@ function createGame() {
     delete game.players[socketId];
   }
 
+  /**
+   * @param {Number} x
+   * @param {Number} y
+   * @return {any} ball
+   */
+  function addBall(x, y) {
+    return game.balls['ball'] = {
+      x: x,
+      y: y,
+      speedX: 0,
+      speedY: 0,
+    };
+  }
+
+  /**
+   * @param {Number} vectorX
+   * @param {Number} vectorY
+   * @param {any} ball
+   * @return {any} ball
+   */
+  function chute(vectorX, vectorY) {
+    ball = game.balls['ball'];
+    ball.speedX += vectorX;
+    ball.speedY += vectorY;
+    return ball;
+  }
+
+  /**
+   * @return {any} ball
+   */
+  function movingBall() {
+    ball = game.balls['ball'];
+
+    ball.x += ball.speedX;
+    ball.y += ball.speedY;
+
+    ball.speedX = 0;
+    ball.speedY = 0;
+    game.balls['ball'] = ball;
+
+    io.emit('update-ball', game.balls['ball']);
+    return ball;
+  }
+
   return game;
 }
+

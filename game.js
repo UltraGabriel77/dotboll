@@ -1,4 +1,5 @@
 /* eslint-disable prefer-rest-params */
+
 /* eslint-disable require-jsdoc */
 const socket = io();
 const times = document.getElementById('lista-de-times');
@@ -18,6 +19,8 @@ $('#time2').click(function(e) {
 
 socket.on('boostrap', (gameInitialState)=>{
   game = gameInitialState;
+  canvas.width = game.canvasWidth;
+  canvas.height = game.canvasHeight;
 
   const context = canvas.getContext('2d');
   console.log('aaaaa');
@@ -34,6 +37,11 @@ socket.on('boostrap', (gameInitialState)=>{
     context.globalAlpha = 1;
     context.fillStyle = 'white';
     context.fillRect(0, 0, game.canvasWidth, game.canvasHeight);
+
+    const ball = game.balls['ball'];
+    context.fillStyle = '#00ff00';
+    context.globalAlpha = 0.7;
+    context.fillRect(ball.x-5, ball.y-5, 10, 10);
     // eslint-disable-next-line guard-for-in
     for (const socketId in game.players) {
       const player = game.players[socketId];
@@ -89,42 +97,113 @@ socket.on('player-update', (player) => {
   game.players[player.socketId] = player.novoState;
 });
 
+socket.on('update-ball', (ball)=>{
+  game.balls['ball'] = ball;
+});
+
 socket.on('disconnect', (player)=>{
-  if (player != null) {
-    delete game.players[player.socketId];
-  }
+  delete game.players[player.socketId];
   $('#'+player.socketId).remove();
 });
 
 function handleKeydown(event) {
   const player = game.players[socket.id];
+  let distance;
+  let a;
+  let b;
+  if (player != undefined) {
+    const ball = game.balls['ball'];
+    a = player.x - ball.x;
+    b = player.y - ball.y;
+
+    distance = Math.sqrt( a*a + b*b );
+  }
 
   if (player!=undefined) {
-    if (event.which === 37 && player.x - 1 >= 0) {
-      player.x = player.x - 1;
+    if (event.which === 37 && player.x - 4 >= 0) {
+      player.x = player.x - 4;
       socket.emit('move-player', socket.id, 'left');
       return;
     }
 
-    if (event.which === 38 && player.y - 1 >= 0) {
-      player.y = player.y - 1;
+    if (event.which === 38 && player.y - 4 >= 0) {
+      player.y = player.y - 4;
       socket.emit('move-player', socket.id, 'up');
       return;
     }
 
-    if (event.which === 39 && player.x + 1 < game.canvasWidth) {
-      player.x = player.x + 1;
+    if (event.which === 39 && player.x + 4 < game.canvasWidth) {
+      player.x = player.x + 4;
       socket.emit('move-player', socket.id, 'right');
       return;
     }
-    if (event.which === 40 && player.y + 1 < game.canvasHeight) {
-      player.y = player.y + 1;
+    if (event.which === 40 && player.y + 4 < game.canvasHeight) {
+      player.y = player.y + 4;
       socket.emit('move-player', socket.id, 'down');
+      return;
+    }
+    if (event.which === 32 && distance <= 30 ) {
+      let vectorX;
+      let vectorY;
+      if (a>=0) {
+        vectorX = -4;
+      } else {
+        vectorX = 4;
+      }
+      if (b>=0) {
+        vectorY = -4;
+      } else {
+        vectorY = 4;
+      }
+      socket.emit('chute', vectorX, vectorY);
+      return;
+    }
+    if (distance <= 10 ) {
+      let vectorX;
+      let vectorY;
+      if (a>=0) {
+        vectorX = -4;
+      } else {
+        vectorX = 4;
+      }
+      if (b>=0) {
+        vectorY = -4;
+      } else {
+        vectorY = 4;
+      }
+      socket.emit('chute', vectorX, vectorY);
       return;
     }
   }
 }
+// Essa lógica deveria estar no server.
+// Como está no front, é fácil burlar.
+function throttle(callback, delay) {
+  let isThrottled = false; let args; let context;
 
+  function wrapper() {
+    if (isThrottled) {
+      args = arguments;
+      context = this;
+      return;
+    }
 
-document.addEventListener('keydown', handleKeydown);
+    isThrottled = true;
+    callback.apply(this, arguments);
+
+    setTimeout(() => {
+      isThrottled = false;
+      if (args) {
+        wrapper.apply(context, args);
+        args = context = null;
+      }
+    }, delay);
+  }
+
+  return wrapper;
+}
+
+const throttledKeydown = throttle(handleKeydown, 30);
+
+document.addEventListener('keydown', throttledKeydown);
 

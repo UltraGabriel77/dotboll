@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable prefer-rest-params */
 
 /* eslint-disable require-jsdoc */
@@ -58,6 +59,76 @@ socket.on('boostrap', (gameInitialState)=>{
     }
     requestAnimationFrame(draw);
   }
+
+
+  const keys = [];
+
+  addEventListener('keydown', (e) => {
+    if (keys.indexOf(e.key) == -1) {
+      console.log(e.key);
+      keys.push(e.key);
+    }
+  });
+
+  addEventListener('keyup', (e) => {
+    if (keys.indexOf(e.key) != undefined) {
+      delete keys[keys.indexOf(e.key)];
+    }
+  });
+
+  function checkKeyboard() {
+    const plr = game.players[socket.id];
+    let distance;
+    let a;
+    let b;
+    let directionX = 0;
+    let directionY = 0;
+    if (plr != undefined) {
+      const ball = game.balls['ball'];
+      a = plr.x - ball.x;
+      b = plr.y - ball.y;
+
+      distance = Math.sqrt( a*a + b*b );
+    }
+    if (plr != undefined) {
+      if (keys.indexOf(String(' ')) != -1 && distance <= 30 ) {
+        let vectorX;
+        let vectorY;
+        if (a>=0) {
+          vectorX = -4;
+        } else {
+          vectorX = 4;
+        }
+        if (b>=0) {
+          vectorY = -4;
+        } else {
+          vectorY = 4;
+        }
+        socket.emit('chute', vectorX, vectorY);
+        return;
+      }
+      if (keys.indexOf('ArrowRight') != -1 && plr.x + 4 < game.canvasWidth) {
+        directionX += 4;
+      }
+      if (keys.indexOf('ArrowUp') != -1 && plr.y - 4 >= 0) {
+        directionY -= 4;
+      }
+      if (keys.indexOf('ArrowLeft') != -1 && plr.x - 4 >= 0) {
+        directionX -= 4;
+      }
+      if (keys.indexOf('ArrowDown') != -1 && plr.y + 4 < game.canvasHeight) {
+        directionY += 4;
+      }
+      if (directionX != 0 && directionY != 0) {
+        socket.emit('move-player', socket.id, directionX, directionY);
+      }
+      plr.y = plr.y + directionY;
+      plr.x = plr.x + directionX;
+      game.players[socket.id] = plr;
+    }
+  }
+
+  setInterval(checkKeyboard, 30);
 });
 
 // Atualizar jogadores:
@@ -106,104 +177,4 @@ socket.on('disconnect', (player)=>{
   $('#'+player.socketId).remove();
 });
 
-function handleKeydown(event) {
-  const player = game.players[socket.id];
-  let distance;
-  let a;
-  let b;
-  if (player != undefined) {
-    const ball = game.balls['ball'];
-    a = player.x - ball.x;
-    b = player.y - ball.y;
-
-    distance = Math.sqrt( a*a + b*b );
-  }
-
-  if (player!=undefined) {
-    if (event.which === 37 && player.x - 4 >= 0) {
-      player.x = player.x - 4;
-      socket.emit('move-player', socket.id, 'left');
-      return;
-    }
-
-    if (event.which === 38 && player.y - 4 >= 0) {
-      player.y = player.y - 4;
-      socket.emit('move-player', socket.id, 'up');
-      return;
-    }
-
-    if (event.which === 39 && player.x + 4 < game.canvasWidth) {
-      player.x = player.x + 4;
-      socket.emit('move-player', socket.id, 'right');
-      return;
-    }
-    if (event.which === 40 && player.y + 4 < game.canvasHeight) {
-      player.y = player.y + 4;
-      socket.emit('move-player', socket.id, 'down');
-      return;
-    }
-    if (event.which === 32 && distance <= 30 ) {
-      let vectorX;
-      let vectorY;
-      if (a>=0) {
-        vectorX = -4;
-      } else {
-        vectorX = 4;
-      }
-      if (b>=0) {
-        vectorY = -4;
-      } else {
-        vectorY = 4;
-      }
-      socket.emit('chute', vectorX, vectorY);
-      return;
-    }
-    if (distance <= 10 ) {
-      let vectorX;
-      let vectorY;
-      if (a>=0) {
-        vectorX = -4;
-      } else {
-        vectorX = 4;
-      }
-      if (b>=0) {
-        vectorY = -4;
-      } else {
-        vectorY = 4;
-      }
-      socket.emit('chute', vectorX, vectorY);
-      return;
-    }
-  }
-}
-// Essa lógica deveria estar no server.
-// Como está no front, é fácil burlar.
-function throttle(callback, delay) {
-  let isThrottled = false; let args; let context;
-
-  function wrapper() {
-    if (isThrottled) {
-      args = arguments;
-      context = this;
-      return;
-    }
-
-    isThrottled = true;
-    callback.apply(this, arguments);
-
-    setTimeout(() => {
-      isThrottled = false;
-      if (args) {
-        wrapper.apply(context, args);
-        args = context = null;
-      }
-    }, delay);
-  }
-
-  return wrapper;
-}
-
-const throttledKeydown = throttle(handleKeydown, 30);
-
-document.addEventListener('keydown', throttledKeydown);
 

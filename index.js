@@ -3,6 +3,7 @@ const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
+
 // eslint-disable-next-line no-unused-vars
 const game = createGame();
 game.addBall(200, 200);
@@ -30,8 +31,8 @@ io.on('connection', (socket)=>{
       novoState: player,
     });
   });
-  socket.on('move-player', (socketId, direction)=>{
-    game.players[socketId] = game.movePlayer(socketId, direction);
+  socket.on('move-player', (socketId, directionX, directionY)=>{
+    game.players[socketId] = game.movePlayer(socketId, directionX, directionY);
     socket.broadcast.emit('player-update', {
       socketId: socketId,
       novoState: game.players[socketId],
@@ -82,12 +83,15 @@ function createGame() {
   /**
    * Move o jogador
    * @param {String} socketId
-   * @param {String} direction
+   * @param {Number} directionX
+   * @param {Number} directionY
    * @return {any} Retorna o jogador movido
    */
-  function movePlayer(socketId, direction) {
+  function movePlayer(socketId, directionX, directionY) {
     player = game.players[socketId];
-    if (direction == 'up' && player.y - 4 >= 0) {
+    player.y = player.y + directionY;
+    player.x = player.x + directionX;
+    /* if (direction == 'up' && player.y - 4 >= 0) {
       player.y = player.y - 4;
     }
     if (direction == 'left' && player.x - 4 >= 0) {
@@ -98,7 +102,7 @@ function createGame() {
     }
     if (direction == 'right' && player.x + 4 <= game.canvasWidth) {
       player.x = player.x + 4;
-    }
+    } */
     return player;
   }
   /**
@@ -154,4 +158,3 @@ function createGame() {
 
   return game;
 }
-

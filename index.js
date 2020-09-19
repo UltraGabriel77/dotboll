@@ -32,6 +32,7 @@ io.on('connection', (socket)=>{
     });
   });
   socket.on('move-player', (socketId, directionX, directionY)=>{
+    console.log(directionY);
     game.players[socketId] = game.movePlayer(socketId, directionX, directionY);
     socket.broadcast.emit('player-update', {
       socketId: socketId,

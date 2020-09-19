@@ -119,12 +119,12 @@ socket.on('boostrap', (gameInitialState)=>{
       if (keys.indexOf('ArrowDown') != -1 && plr.y + 4 < game.canvasHeight) {
         directionY += 4;
       }
-      if (directionX != 0 && directionY != 0) {
+      if (directionX != 0 || directionY != 0) {
         socket.emit('move-player', socket.id, directionX, directionY);
+        plr.y = plr.y + directionY;
+        plr.x = plr.x + directionX;
+        game.players[socket.id] = plr;
       }
-      plr.y = plr.y + directionY;
-      plr.x = plr.x + directionX;
-      game.players[socket.id] = plr;
     }
   }
 

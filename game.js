@@ -3,11 +3,13 @@
 
 /* eslint-disable require-jsdoc */
 const socket = io();
-const times = document.getElementById('lista-de-times');
+const times1 = document.getElementById('timelist1');
+const times2 = document.getElementById('timelist2');
 const canvas = document.getElementById('game');
 
 // Alterar o nome e o time
 $('#time1').click(function(e) {
+  console.log('vermelho');
   e.preventDefault();
   socket.emit('set-team', socket.id, 'red', $('#name-getter').val());
   return false;
@@ -25,6 +27,7 @@ socket.on('boostrap', (gameInitialState)=>{
 
   const context = canvas.getContext('2d');
   console.log('aaaaa');
+  updateTeam();
 
   requestAnimationFrame(draw);
 
@@ -134,6 +137,32 @@ socket.on('boostrap', (gameInitialState)=>{
 // Atualizar jogadores:
 socket.on('new-player', (player) => {
   game.players[player.socketId] = player.novoState;
+  updateTeam();
+});
+socket.on('player-update', (player) => {
+  console.log(player);
+  game.players[player.socketId] = player.novoState;
+});
+
+socket.on('update-ball', (ball)=>{
+  game.balls['ball'] = ball;
+});
+
+socket.on('score-update', (score)=>{
+  game.score = score;
+  $('#score-red').text(game.score.red);
+  $('#score-blue').text(game.score.blue);
+});
+
+socket.on('disconnect', (player)=>{
+  console.log(player);
+  delete game.players[player.socketId];
+  $('#'+player.socketId).remove();
+  updateTeam();
+});
+
+
+function updateTeam() {
   lista1 = ``;
   lista2 = ``;
   // eslint-disable-next-line guard-for-in
@@ -151,30 +180,7 @@ socket.on('new-player', (player) => {
       lista2 += `<li>${element.name}</li>`;
     }
   }
-  lista = `
-    <h4>Time 1: </h4>
-    <ul id="timelist1"></ul>
-    ${lista1}
-    <button id="time1">Entrar</button>
-    <h4>Time 2: </h4>
-    ${lista2}
-    <ul id="timelist2"></ul>
-    <button id="time2">Entrar</button>
-  `;
-  times.innerHTML = lista;
-});
-socket.on('player-update', (player) => {
-  console.log(player);
-  game.players[player.socketId] = player.novoState;
-});
-
-socket.on('update-ball', (ball)=>{
-  game.balls['ball'] = ball;
-});
-
-socket.on('disconnect', (player)=>{
-  delete game.players[player.socketId];
-  $('#'+player.socketId).remove();
-});
-
+  times1.innerHTML = lista1;
+  times2.innerHTML = lista2;
+}
 

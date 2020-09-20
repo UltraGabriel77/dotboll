@@ -4,8 +4,7 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
 
-// eslint-disable-next-line no-unused-vars
-const game = createGame();
+let game = createGame();
 game.addBall(200, 200);
 app.get('/', (_req, res)=>{
   res.sendFile(__dirname + '/index.html');
@@ -17,6 +16,7 @@ app.get('/game.js', (_req, res)=>{
 io.on('connection', (socket)=>{
   console.log('User conected: ' + socket.id);
   socket.emit('boostrap', game);
+  io.emit('score-update', game.score);
   socket.on('disconnect', () => {
     console.log('user disconnected: '+ socket.id);
     io.emit('disconnect', game.players[socket.id]);
@@ -46,6 +46,10 @@ io.on('connection', (socket)=>{
     ball.x = vectorX;
     ball.y = vectorY;
   });
+  socket.on('begin', ()=>{
+    game = createGame();
+    socket.emit('boostrap', game);
+  });
   setInterval(game.movingBall, 100);
 });
 
@@ -64,6 +68,10 @@ function createGame() {
     players: {},
     balls: {},
     gol: {},
+    score: {
+      'red': 0,
+      'blue': 0,
+    },
     addPlayer,
     movePlayer,
     removePlayer,
@@ -140,6 +148,14 @@ function createGame() {
 
     ball.x += ball.speedX;
     ball.y += ball.speedY;
+    if (ball.x >= game.canvasWidth) {
+      game.score.red += 1;
+      io.emit('score-update', game.score);
+    }
+    if (ball.x <= 0) {
+      game.score.blue += 1;
+      io.emit('score-update', game.score);
+    }
     if (ball.x >= game.canvasWidth ||
         ball.y >= game.canvasHeight ||
         ball.x <= 0 || ball.y <= 0) {

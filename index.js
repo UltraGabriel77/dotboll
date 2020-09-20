@@ -32,7 +32,6 @@ io.on('connection', (socket)=>{
     });
   });
   socket.on('move-player', (socketId, directionX, directionY)=>{
-    console.log(directionY);
     game.players[socketId] = game.movePlayer(socketId, directionX, directionY);
     socket.broadcast.emit('player-update', {
       socketId: socketId,
@@ -41,6 +40,11 @@ io.on('connection', (socket)=>{
   });
   socket.on('chute', (vectorX, vectorY)=>{
     game.balls['ball'] = game.chute(vectorX, vectorY);
+  });
+  socket.on('ball-to', (vectorX, vectorY)=>{
+    ball = game.balls['ball'];
+    ball.x = vectorX;
+    ball.y = vectorY;
   });
   setInterval(game.movingBall, 100);
 });
@@ -92,18 +96,6 @@ function createGame() {
     player = game.players[socketId];
     player.y = player.y + directionY;
     player.x = player.x + directionX;
-    /* if (direction == 'up' && player.y - 4 >= 0) {
-      player.y = player.y - 4;
-    }
-    if (direction == 'left' && player.x - 4 >= 0) {
-      player.x = player.x - 4;
-    }
-    if (direction == 'down' && player.y + 4 <= game.canvasHeight) {
-      player.y = player.y + 4;
-    }
-    if (direction == 'right' && player.x + 4 <= game.canvasWidth) {
-      player.x = player.x + 4;
-    } */
     return player;
   }
   /**
@@ -148,6 +140,12 @@ function createGame() {
 
     ball.x += ball.speedX;
     ball.y += ball.speedY;
+    if (ball.x >= game.canvasWidth ||
+        ball.y >= game.canvasHeight ||
+        ball.x <= 0 || ball.y <= 0) {
+      ball.x = game.canvasWidth/2;
+      ball.y = game.canvasHeight/2;
+    }
 
     ball.speedX = 0;
     ball.speedY = 0;

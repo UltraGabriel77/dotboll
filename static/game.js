@@ -153,10 +153,8 @@ socket.on('score-update', (score)=>{
   $('#score-blue').text(game.score.blue);
 });
 
-socket.on('disconnect', (player)=>{
-  console.log(player);
-  delete game.players[player.socketId];
-  $('#'+player.socketId).remove();
+socket.on('disconnect', (game)=>{
+  this.game = game;
   updateTeam();
 });
 

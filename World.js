@@ -1,4 +1,5 @@
 const EventEmitter = require('events');
+const {Player} = require('./Player');
 /**
  * Classe para definir o jogo atual
  */
@@ -11,6 +12,8 @@ class World extends EventEmitter {
     'red': 0,
     'blue': 0,
   };
+  slowing = false;
+  tween;
   /**
    * @param {Number} width
    * @param {Number} height
@@ -28,12 +31,8 @@ class World extends EventEmitter {
    * @return {any} Retorna o objeto player
    */
   addPlayer(socketId, team, name) {
-    return this.players[socketId] = {
-      name: name,
-      x: 100,
-      y: 100,
-      team: team,
-    };
+    return this.players[socketId] =
+      new Player(100, 100, name, socketId, team);
   }
   /**
    * Move o jogador
@@ -104,12 +103,16 @@ class World extends EventEmitter {
       ball.x = this.canvasWidth / 2;
       ball.y = this.canvasHeight / 2;
     }
+    if (ball.speedX != 0 && ball.speedY != 0) {
+      ball.speedX -= Math.sign(ball.speedX);
+      ball.speedY -= Math.sign(ball.speedY);
+    }
 
-    ball.speedX = 0;
-    ball.speedY = 0;
     this.balls['ball'] = ball;
 
     return ball;
   }
 }
 exports.World = World;
+
+

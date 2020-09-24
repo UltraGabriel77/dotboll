@@ -109,6 +109,22 @@ socket.on('boostrap', (gameInitialState)=>{
         socket.emit('chute', vectorX, vectorY);
         return;
       }
+      if (distance <= 10 ) {
+        let vectorX;
+        let vectorY;
+        if (a>=0) {
+          vectorX = -2;
+        } else {
+          vectorX = 2;
+        }
+        if (b>=0) {
+          vectorY = -2;
+        } else {
+          vectorY = 2;
+        }
+        socket.emit('chute', vectorX, vectorY);
+        return;
+      }
       if (keys.indexOf('ArrowRight') != -1 && plr.x + 4 < game.canvasWidth) {
         directionX += 4;
       }

@@ -2,11 +2,7 @@
     "eslint.alwaysShowStatus": true,
     "eslint.format.enable": true,
     "eslint.validate": [
-        "vue",
         "html",
         "javascript",
-        "typescript",
-        "javascriptreact",
-        "typescriptreact"
     ]
 }

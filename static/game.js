@@ -1,7 +1,3 @@
-/* eslint-disable max-len */
-/* eslint-disable prefer-rest-params */
-
-/* eslint-disable require-jsdoc */
 const socket = io();
 const times1 = document.getElementById('timelist1');
 const times2 = document.getElementById('timelist2');
@@ -79,6 +75,9 @@ socket.on('boostrap', (gameInitialState)=>{
     }
   });
 
+  /**
+   * Checa as teclas
+   */
   function checkKeyboard() {
     const plr = game.players[socket.id];
     let distance;
@@ -161,7 +160,9 @@ socket.on('disconnect', (player)=>{
   updateTeam();
 });
 
-
+/**
+ * Atualiza os membros do time
+ */
 function updateTeam() {
   lista1 = ``;
   lista2 = ``;

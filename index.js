@@ -1,11 +1,11 @@
 const express = require('express');
+const {World} = require('./World');
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
 
-let game = createGame();
-game.addBall(200, 200);
+const game = new World(400, 400);
 app.use(express.static(`${__dirname}/static`));
 
 io.on('connection', (socket)=>{
@@ -45,13 +45,18 @@ io.on('connection', (socket)=>{
     game = createGame();
     socket.emit('boostrap', game);
   });
-  setInterval(game.movingBall, 100);
+  game.on('score-update', (score)=>{
+    io.emit('score-update', score);
+  });
+  setInterval(()=>{
+    game.movingBall();
+    io.emit('update-ball', game.balls['ball']);
+  }, 100);
 });
 
 http.listen(3000, ()=>{
   console.log('hosting on *:3000');
 });
-
 /**
  * Cria o jogo
  * @return {game}jogo

@@ -2,9 +2,12 @@
   "name": "dotboll",
   "version": "1.0.0",
   "description": "Um jogo de futebol",
-  "main": "index.ts",
+  "main": "index.js",
+  "engines": {
+    "node": "12.17.x"
+  },
   "scripts": {
-    "test": "npm run"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",

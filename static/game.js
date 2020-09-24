@@ -85,6 +85,7 @@ socket.on('boostrap', (gameInitialState)=>{
     let b;
     let directionX = 0;
     let directionY = 0;
+    const speedBall = 3;
     if (plr != undefined) {
       const ball = game.balls['ball'];
       a = plr.x - ball.x;
@@ -96,15 +97,15 @@ socket.on('boostrap', (gameInitialState)=>{
       if (keys.indexOf(String(' ')) != -1 && distance <= 30 ) {
         let vectorX;
         let vectorY;
-        if (a>=0) {
-          vectorX = -4;
-        } else {
-          vectorX = 4;
+        if (a>=6) {
+          vectorX = -speedBall;
+        } else if (a<=-6) {
+          vectorX = speedBall;
         }
-        if (b>=0) {
-          vectorY = -4;
-        } else {
-          vectorY = 4;
+        if (b>=6) {
+          vectorY = -speedBall;
+        } else if (b<=-6) {
+          vectorY = speedBall;
         }
         socket.emit('chute', vectorX, vectorY);
         return;
@@ -112,15 +113,15 @@ socket.on('boostrap', (gameInitialState)=>{
       if (distance <= 10 ) {
         let vectorX;
         let vectorY;
-        if (a>=0) {
-          vectorX = -2;
-        } else {
-          vectorX = 2;
+        if (a>=6) {
+          vectorX = -speedBall;
+        } else if (a<=-6) {
+          vectorX = speedBall;
         }
-        if (b>=0) {
-          vectorY = -2;
-        } else {
-          vectorY = 2;
+        if (b>=6) {
+          vectorY = -speedBall;
+        } else if (b<=-6) {
+          vectorY = speedBall;
         }
         socket.emit('chute', vectorX, vectorY);
         return;

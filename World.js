@@ -103,8 +103,10 @@ class World extends EventEmitter {
       ball.x = this.canvasWidth / 2;
       ball.y = this.canvasHeight / 2;
     }
-    if (ball.speedX != 0 && ball.speedY != 0) {
+    if (ball.speedX != 0) {
       ball.speedX -= Math.sign(ball.speedX);
+    }
+    if (ball.speedY != 0) {
       ball.speedY -= Math.sign(ball.speedY);
     }
 

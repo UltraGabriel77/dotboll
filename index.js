@@ -3,7 +3,7 @@ const {World} = require('./World');
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
-
+const PORT = process.env.PORT || 3000;
 
 const game = new World(400, 400);
 app.use(express.static(`${__dirname}/static`));
@@ -54,6 +54,6 @@ io.on('connection', (socket)=>{
   }, 100);
 });
 
-http.listen(3000, ()=>{
+http.listen(PORT, ()=>{
   console.log('> hosting on localhost:3000');
 });

@@ -6,12 +6,7 @@ const io = require('socket.io')(http);
 
 let game = createGame();
 game.addBall(200, 200);
-app.get('/', (_req, res)=>{
-  res.sendFile(__dirname + '/index.html');
-});
-app.get('/game.js', (_req, res)=>{
-  res.sendFile(__dirname + '/game.js');
-});
+app.use(express.static(`${__dirname}/static`));
 
 io.on('connection', (socket)=>{
   console.log('User conected: ' + socket.id);
@@ -59,7 +54,7 @@ http.listen(3000, ()=>{
 
 /**
  * Cria o jogo
- * @return {game} retorna o jogo
+ * @return {game}jogo
  */
 function createGame() {
   const game = {

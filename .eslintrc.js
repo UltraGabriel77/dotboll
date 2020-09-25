@@ -9,12 +9,14 @@ module.exports = {
     'google',
     'plugin:node/recommended',
   ],
-  'parser': '@typescript-eslint/parser',
+  'parser': '@babel/eslint-parser',
   'parserOptions': {
+    'requireConfigFile': false,
     'ecmaVersion': 12,
   },
   'plugins': [
     'html',
+    '@babel',
   ],
   'settings': {
     'html/indent': '0',

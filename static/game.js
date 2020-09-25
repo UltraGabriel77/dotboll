@@ -94,18 +94,18 @@ socket.on('boostrap', (gameInitialState)=>{
       distance = Math.sqrt( a*a + b*b );
     }
     if (plr != undefined) {
-      if (keys.indexOf(String(' ')) != -1 && distance <= 30 ) {
+      if (keys.indexOf(String(' ')) != -1 && distance <= 20 ) {
         let vectorX;
         let vectorY;
         if (a>=6) {
-          vectorX = -speedBall;
+          vectorX = -speedBall+3;
         } else if (a<=-6) {
-          vectorX = speedBall;
+          vectorX = speedBall+3;
         }
         if (b>=6) {
-          vectorY = -speedBall;
+          vectorY = -speedBall+3;
         } else if (b<=-6) {
-          vectorY = speedBall;
+          vectorY = speedBall+3;
         }
         socket.emit('chute', vectorX, vectorY);
         return;

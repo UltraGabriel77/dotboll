@@ -39,7 +39,7 @@ function initServer() {
         novoState: player,
       });
     });
-    socket.on('chute', ()=>{
+    socket.on('chute', (vectorX, vectorY)=>{
       game.balls['ball'] = game.chute(vectorX, vectorY);
     });
     socket.on('ball-to', (vectorX, vectorY) => {

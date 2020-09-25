@@ -11,7 +11,7 @@ function initServer() {
   console.log('> Iniciando o server');
 
   app.use(express.static(`${__dirname}/static`));
-  const game = createWorld(400, 400);
+  const game = createWorld(400, 400, io);
   game.addBall(200, 200);
 
   io.on('connection', (socket) => {

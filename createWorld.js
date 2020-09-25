@@ -1,12 +1,11 @@
-const {io} = require('./index');
-
 /**
  * Cria o mundo do jogo
  * @param {number} width
  * @param {number} height
+ * @param {io} io
  * @return {game} Mundo
  */
-function createWorld(width, height) {
+function createWorld(width, height, io) {
   const world = {
     canvasWidth: width,
     canvasHeight: height,

@@ -85,7 +85,7 @@ function createWorld(width, height, io) {
    * @return {any} ball
    */
   function addBall(x, y) {
-    return (world.balls["ball"] = {
+    return (world.balls['ball'] = {
       x: x,
       y: y,
       speedX: 0,
@@ -99,7 +99,7 @@ function createWorld(width, height, io) {
    * @return {any} ball
    */
   function chute(vectorX, vectorY) {
-    const ball = world.balls["ball"];
+    const ball = world.balls['ball'];
     ball.speedX = vectorX;
     ball.speedY = vectorY;
     return ball;
@@ -108,22 +108,22 @@ function createWorld(width, height, io) {
    * @return {any} ball
    */
   function movingBall() {
-    if (world.balls["ball"] == undefined) {
+    if (world.balls['ball'] === undefined) {
       world.addBall(200, 200);
     }
-    const ball = world.balls["ball"];
+    const ball = world.balls['ball'];
 
     ball.x += ball.speedX;
     ball.y += ball.speedY;
     changeScore();
-    if (ball.speedX != 0) {
+    if (ball.speedX !== 0) {
       ball.speedX -= Math.sign(ball.speedX);
     }
-    if (ball.speedY != 0) {
+    if (ball.speedY !== 0) {
       ball.speedY -= Math.sign(ball.speedY);
     }
 
-    world.balls["ball"] = ball;
+    world.balls['ball'] = ball;
 
     return ball;
 
@@ -133,11 +133,11 @@ function createWorld(width, height, io) {
     function changeScore() {
       if (ball.x >= world.canvasWidth) {
         world.score.red += 1;
-        io.emit("score-update", world.score);
+        io.emit('score-update', world.score);
       }
       if (ball.x <= 0) {
         world.score.blue += 1;
-        io.emit("score-update", world.score);
+        io.emit('score-update', world.score);
       }
       if (
         ball.x >= world.canvasWidth ||

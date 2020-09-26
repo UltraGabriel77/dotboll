@@ -24,6 +24,7 @@ function initServer() {
     console.log("> User conected: " + socket.id);
     socket.emit("boostrap", game);
     io.emit("score-update", game.score);
+
     socket.on("disconnect", () => {
       playerDisconnect(socket);
     });
@@ -48,7 +49,7 @@ function initServer() {
     setInterval(() => {
       game.movingBall();
       io.emit("update-ball", game.balls["ball"]);
-    }, 100);
+    }, 30);
   }
 
   function movePlayer(socketId, directionX, directionY, socket) {

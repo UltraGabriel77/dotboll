@@ -1,9 +1,27 @@
 /**
+ * @typedef {{canvasWidth: number,
+ * canvasHeight: number,
+ * players: {},
+ * balls: {},
+ * score: {
+ *  red: number,
+ *  blue: number;,
+ * },
+ * addPlayer: (socketId: string, team: string, name: string) => Player,
+ * movePlayer: (socketId: string, directionX: number, directionY: number) => any,
+ * removePlayer: (socketId: string) => void,
+ * addBall: (x: number, y: number) => any,
+ * chute: (vectorX: number, vectorY: number) => any,
+ * movingBall: () => any;
+ * }} World
+ */
+
+/**
  * Cria o mundo do jogo
  * @param {number} width
  * @param {number} height
- * @param {io} io
- * @return {game} Mundo
+ * @param {SocketIO.Server} io
+ * @return {World} Mundo
  */
 function createWorld(width, height, io) {
   const world = {
@@ -12,31 +30,35 @@ function createWorld(width, height, io) {
     players: {},
     balls: {},
     score: {
-      'red': 0,
-      'blue': 0,
+      red: 0,
+      blue: 0
     },
     addPlayer,
     movePlayer,
     removePlayer,
     addBall,
     chute,
-    movingBall,
+    movingBall
   };
+  /**
+   * @typedef {{x: number,y: number,team,name,id,keys}} Player
+   */
+
   /**
    * @param {String} socketId id do jogador
    * @param {String} team time do jogador
    * @param {String} name nome escolhido pelo jogador
-   * @return {any} Retorna o objeto player
+   * @return {Player} Retorna o objeto player
    */
   function addPlayer(socketId, team, name) {
-    return world.players[socketId] = {
+    return (world.players[socketId] = {
       x: 100,
       y: 100,
       team: team,
       name: name,
       id: socketId,
-      keys: [],
-    };
+      keys: []
+    });
   }
   /**
    * Move o jogador
@@ -63,12 +85,12 @@ function createWorld(width, height, io) {
    * @return {any} ball
    */
   function addBall(x, y) {
-    return world.balls['ball'] = {
+    return (world.balls["ball"] = {
       x: x,
       y: y,
       speedX: 0,
-      speedY: 0,
-    };
+      speedY: 0
+    });
   }
   /**
    * @param {Number} vectorX
@@ -77,7 +99,7 @@ function createWorld(width, height, io) {
    * @return {any} ball
    */
   function chute(vectorX, vectorY) {
-    const ball = world.balls['ball'];
+    const ball = world.balls["ball"];
     ball.speedX = vectorX;
     ball.speedY = vectorY;
     return ball;
@@ -86,10 +108,10 @@ function createWorld(width, height, io) {
    * @return {any} ball
    */
   function movingBall() {
-    if (world.balls['ball'] == undefined) {
+    if (world.balls["ball"] == undefined) {
       world.addBall(200, 200);
     }
-    const ball = world.balls['ball'];
+    const ball = world.balls["ball"];
 
     ball.x += ball.speedX;
     ball.y += ball.speedY;
@@ -101,7 +123,7 @@ function createWorld(width, height, io) {
       ball.speedY -= Math.sign(ball.speedY);
     }
 
-    world.balls['ball'] = ball;
+    world.balls["ball"] = ball;
 
     return ball;
 
@@ -111,15 +133,18 @@ function createWorld(width, height, io) {
     function changeScore() {
       if (ball.x >= world.canvasWidth) {
         world.score.red += 1;
-        io.emit('score-update', world.score);
+        io.emit("score-update", world.score);
       }
       if (ball.x <= 0) {
         world.score.blue += 1;
-        io.emit('score-update', world.score);
+        io.emit("score-update", world.score);
       }
-      if (ball.x >= world.canvasWidth ||
+      if (
+        ball.x >= world.canvasWidth ||
         ball.y >= world.canvasHeight ||
-        ball.x <= 0 || ball.y <= 0) {
+        ball.x <= 0 ||
+        ball.y <= 0
+      ) {
         ball.x = world.canvasWidth / 2;
         ball.y = world.canvasHeight / 2;
       }

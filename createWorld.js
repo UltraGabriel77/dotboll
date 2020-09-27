@@ -1,4 +1,8 @@
 /**
+ * @typedef {{x: number,y: number,team,name,id,keys: string[]}} Player
+ */
+
+/**
  * @typedef {{canvasWidth: number,
  * canvasHeight: number,
  * players: {},
@@ -40,9 +44,6 @@ function createWorld(width, height, io) {
     chute,
     movingBall
   };
-  /**
-   * @typedef {{x: number,y: number,team,name,id,keys}} Player
-   */
 
   /**
    * @param {String} socketId id do jogador

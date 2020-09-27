@@ -2,3 +2,6 @@
 
 # dotboll
 Jogo de futebol feito com javascript, node js e socket.io
+
+[Site](https://ultragabriel77.github.io/dotboll)
+[Jogo](https://dotboll.herokuapp.com/)

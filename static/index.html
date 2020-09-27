@@ -144,7 +144,7 @@ socket.on('boostrap',
               context.fillStyle = '#0000ff';
             }
             context.globalAlpha = 0.4;
-            context.fillRect(player.x - 5, player.y - 5, 10, 10);
+            context.fillRect(player.x - 10, player.y - 10, 20, 20);
           }
         }
         requestAnimationFrame(draw);
@@ -166,8 +166,8 @@ socket.on('boostrap',
       });
 
       /**
-           * Checa as teclas
-           */
+      * Checa as teclas
+      */
       function checkKeyboard() {
         const plr = game.players[socket.id];
         let distance;
@@ -175,7 +175,7 @@ socket.on('boostrap',
         let b;
         let directionX = 0;
         let directionY = 0;
-        const speedBall = 5;
+        const speedBall = 8;
         if (plr !== undefined) {
           const ball = game.balls['ball'];
           a = plr.x - ball.x;
@@ -184,7 +184,7 @@ socket.on('boostrap',
           distance = Math.sqrt(a * a + b * b);
         }
         if (plr !== undefined) {
-          if (distance <= 15) {
+          if (distance <= 20) {
             let vectorX;
             let vectorY;
             if (a >= 6) {
@@ -198,6 +198,22 @@ socket.on('boostrap',
               vectorY = speedBall;
             }
             socket.emit('chute', vectorX, vectorY);
+          }
+          if (keys.indexOf(' ') !== -1 && distance <= 25) {
+            let vectorX;
+            let vectorY;
+            const imp = 2
+            if (a >= 6) {
+              vectorX = -speedBall*imp;
+            } else if (a <= -6) {
+              vectorX = speedBall*imp;
+            }
+            if (b >= 6) {
+              vectorY = -speedBall*imp;
+            } else if (b <= -6) {
+              vectorY = speedBall*imp; 
+            }
+            socket.emit('chute', vectorX, vectorY); 
           }
           if (keys.indexOf('ArrowRight') !== -1 &&
           plr.x + 4 < game.canvasWidth) {

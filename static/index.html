@@ -20,8 +20,8 @@
                
             }
             #game{
-                Height:300px;
-                width:30%;
+                Height:70vh;
+                width:70vh;
                 margin-top:40px;
                 margin-left:20%;
                 margin-right:10px;
@@ -132,7 +132,7 @@ socket.on('boostrap',
         const ball = game.balls['ball'];
         context.fillStyle = '#00ff00';
         context.globalAlpha = 0.7;
-        context.fillRect(ball.x - 10, ball.y - 10, 20, 20);
+        context.fillRect(ball.x - 5, ball.y - 5, 10, 10);
         // eslint-disable-next-line guard-for-in
         for (const socketId in game.players) {
           const player = game.players[socketId];
@@ -144,7 +144,7 @@ socket.on('boostrap',
               context.fillStyle = '#0000ff';
             }
             context.globalAlpha = 0.4;
-            context.fillRect(player.x - 10, player.y - 10, 20, 20);
+            context.fillRect(player.x - 5, player.y - 5, 10, 10);
           }
         }
         requestAnimationFrame(draw);
@@ -175,7 +175,7 @@ socket.on('boostrap',
         let b;
         let directionX = 0;
         let directionY = 0;
-        const speedBall = 8;
+        const speedBall = 4;
         if (plr !== undefined) {
           const ball = game.balls['ball'];
           a = plr.x - ball.x;

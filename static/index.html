@@ -87,6 +87,11 @@ const exports = {'__esModule': true};
 $('#time1').mouseup(function(e) {
   console.log('vermelho');
   e.preventDefault();
+  if (!Date.now) {
+    Date.now = function() { return new Date().getTime(); }
+  }else{
+    console.log(Date.now());
+  }
   socket.emit('set-team', socket.id, 'red', $('#name-getter').val());
   return false;
 });
@@ -95,8 +100,7 @@ $('#time2').mouseup(function(e) {
   socket.emit('set-team', socket.id, 'blue', $('#name-getter').val());
   return false;
 });
-        </script>
-        <script>
+
 const socket = io();
 const times1 = document.getElementById('timelist1');
 const times2 = document.getElementById('timelist2');
@@ -244,6 +248,7 @@ socket.on('boostrap',
 
 // Atualizar jogadores:
 socket.on('new-player', (player) => {
+  console.log(Date.now());
   game.players[player.socketId] = player.novoState;
   updateTeam();
 });

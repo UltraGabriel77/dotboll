@@ -12,7 +12,8 @@
  *  blue: number;,
  * },
  * addPlayer: (socketId: string, team: string, name: string) => Player,
- * movePlayer: (socketId: string, directionX: number, directionY: number) => any,
+ * movePlayer:
+ * (socketId: string, directionX: number, directionY: number) => any,
  * removePlayer: (socketId: string) => void,
  * addBall: (x: number, y: number) => any,
  * chute: (vectorX: number, vectorY: number) => any,
@@ -35,14 +36,14 @@ function createWorld(width, height, io) {
     balls: {},
     score: {
       red: 0,
-      blue: 0
+      blue: 0,
     },
     addPlayer,
     movePlayer,
     removePlayer,
     addBall,
     chute,
-    movingBall
+    movingBall,
   };
 
   /**
@@ -58,7 +59,7 @@ function createWorld(width, height, io) {
       team: team,
       name: name,
       id: socketId,
-      keys: []
+      keys: [],
     });
   }
   /**
@@ -90,7 +91,7 @@ function createWorld(width, height, io) {
       x: x,
       y: y,
       speedX: 0,
-      speedY: 0
+      speedY: 0,
     });
   }
   /**

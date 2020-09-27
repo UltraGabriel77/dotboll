@@ -1,19 +1,19 @@
-const { createWorld } = require('./createWorld');
+const {createWorld} = require('./createWorld');
 const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 /**
  * Iniciar o server e pegar os eventos
  */
 function initServer() {
-  console.log('> Iniciando o server');
+  console.log('[initServer] > Iniciando o server');
 
   app.use(express.static(`${__dirname}/static`));
-  const game = createWorld(400, 400, io);
-  game.addBall(200, 200);
+  const game = createWorld(600, 600, io);
+  game.addBall(300, 300);
 
   io.on('connection', (socket) => {
     playerConnection(socket);
@@ -23,9 +23,10 @@ function initServer() {
 
   /**
    * Se conecta com o usuário
+   * @param {any} socket
    */
   function playerConnection(socket) {
-    console.log('> User conected: ' + socket.id);
+    console.log('[playerConnection] > User conected: ' + socket.id);
     socket.emit('boostrap', game);
     io.emit('score-update', game.score);
 
@@ -47,7 +48,7 @@ function initServer() {
       ball.y = vectorY;
     });
     socket.on('begin', () => {
-      let game = createWorld(400, 400);
+      game = createWorld(400, 400);
       socket.emit('boostrap', game);
     });
     setInterval(() => {
@@ -58,33 +59,43 @@ function initServer() {
 
   /**
    * Mover o jogador
+   * @param {String} socketId
+   * @param {Number} directionX
+   * @param {Number} directionY
+   * @param {any} socket
    */
   function movePlayer(socketId, directionX, directionY, socket) {
     const player = game.movePlayer(socketId, directionX, directionY);
     socket.broadcast.emit('player-update', {
       socketId: socketId,
-      novoState: player
+      novoState: player,
     });
   }
 
   /**
    * Muda o time
+   * @param {String} socketId
+   * @param {String} team
+   * @param {String} name
    */
   function changePlayerTeam(socketId, team, name) {
     const player = game.addPlayer(socketId, team, name);
-    console.log(player.name + ' entrou para o time ' + team);
+    console.log(
+        '[changePlayerTeam] ' + player.name + ' entrou para o time ' + team,
+    );
     player.team = team;
     io.emit('new-player', {
       socketId: socketId,
-      novoState: player
+      novoState: player,
     });
   }
 
   /**
    * Desconecta o jogador
+   * @param {any} socket
    */
   function playerDisconnect(socket) {
-    console.log('> user disconnected: ' + socket.id);
+    console.log('[playerDisconnect] > user disconnected: ' + socket.id);
     game.removePlayer(socket.id);
     io.emit('disconnect', game);
   }
@@ -94,7 +105,7 @@ function initServer() {
    */
   function host() {
     http.listen(PORT, () => {
-      console.log('> hosting on localhost:3000');
+      console.log('[host] > hosting on localhost:3000');
     });
   }
 }
